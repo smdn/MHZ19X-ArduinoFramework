@@ -23,6 +23,7 @@ TO BE ADDED
 - ATtiny 402
 - ATtiny 404
 - Arduino Nano
+- Arduino Nano Every
 
 TO BE ADDED
 

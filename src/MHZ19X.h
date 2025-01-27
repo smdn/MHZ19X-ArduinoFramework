@@ -47,6 +47,50 @@ using MHZ19C = MHZ19XDriver<DefaultSerialStream>;
 #endif
 
 //
+// atmelmegaavr + nano_every (Arduino Nano Every/ATmega4809)
+//
+#if defined (__AVR_ATmega4809__)
+#include <ArduinoHardwareSerialStream.hpp>
+
+#if defined(HAVE_HWSERIAL1)
+class Serial1Stream : public ArduinoHardwareSerialStream {
+public:
+  Serial1Stream()
+    : ArduinoHardwareSerialStream(&Serial1)
+  {
+  }
+};
+
+using MHZ19C_Serial1 = MHZ19XDriver<Serial1Stream>;
+#endif
+
+#if defined(HAVE_HWSERIAL2)
+class Serial2Stream : public ArduinoHardwareSerialStream {
+public:
+  Serial2Stream()
+    : ArduinoHardwareSerialStream(&Serial2)
+  {
+  }
+};
+
+using MHZ19C_Serial2 = MHZ19XDriver<Serial2Stream>;
+#endif
+
+#if defined(HAVE_HWSERIAL3)
+class Serial3Stream : public ArduinoHardwareSerialStream {
+public:
+  Serial3Stream()
+    : ArduinoHardwareSerialStream(&Serial3)
+  {
+  }
+};
+
+using MHZ19C_Serial3 = MHZ19XDriver<Serial3Stream>;
+#endif
+
+#endif //__AVR_ATmega4809__
+
+//
 // atmelmegaavr + ATtinyX02 (202/402)
 // atmelmegaavr + ATtinyX04 (204/404/804/1604)
 //
