@@ -21,6 +21,7 @@ public:
   MHZ19X_error_t getCO2Concentration(uint16_t& co2ConcentrationInPpm) /*const*/;
   MHZ19X_error_t switchSelfCalibration(const bool& enableAutoCalibration) /*const*/;
 
+  TUartStream& getStream() { return stream; }
 
 protected:
   MHZ19X_error_t sendCommand(const uint8_t* /*const*/ command, uint8_t* returnValue) /*const*/;
