@@ -24,7 +24,7 @@ public:
   ) /* const */
   {
     serial.begin(baud, configurations, PIN_RX, PIN_TX);
-    serial.setTimeout(5000); // TODO: make configurable
+    serial.setTimeout(1000); // TODO: make configurable
   }
 
   bool writeBytes(
