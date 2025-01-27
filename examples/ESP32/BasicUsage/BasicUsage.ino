@@ -3,11 +3,13 @@
 #include <Arduino.h>
 #include <MHZ19X.h>
 
-// use UART2 (Hardware serial; RX=GPIO16, TX=GPIO17)
+// This code uses the UART2 serial port to connect to the MH-Z19C.
+// (Hardware serial; RX=GPIO16, TX=GPIO17)
 auto co2sensor = MHZ19C_UART2();
 
 /*
-// use UART1 (Hardware serial; RX=GPIO9, TX=GPIO10)
+// This code uses the UART1 serial port to connect to the MH-Z19C.
+// (Hardware serial; RX=GPIO9, TX=GPIO10)
 auto co2sensor = MHZ19C_UART1();
 */
 

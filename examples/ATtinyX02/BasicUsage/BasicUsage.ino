@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <MHZ19X.h>
 
-// use PA6 is used for RX and PA7 for TX.
+// This code uses serial communication with PA6 as RX and PA7 as TX to connect to the MH-Z19C.
 auto co2sensor = MHZ19C<PIN_PA6, PIN_PA7>();
 
 void setup()
