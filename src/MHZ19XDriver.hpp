@@ -5,10 +5,11 @@
 #define MHZ19XDriver_hpp
 
 #include <Arduino.h>
+#include "MHZ19XBase.hpp"
 #include "MHZ19X_error_t.hpp"
 
 template <typename TUartStream>
-class MHZ19XDriver {
+class MHZ19XDriver : MHZ19XBase {
 public:
   MHZ19XDriver()
     : stream()
@@ -20,16 +21,11 @@ public:
   MHZ19X_error_t getCO2Concentration(uint16_t& co2ConcentrationInPpm) /*const*/;
   MHZ19X_error_t switchSelfCalibration(const bool& enableAutoCalibration) /*const*/;
 
-protected:
-  static constexpr size_t COMMAND_LENGTH = 9;
-  static constexpr size_t RETURNVALUE_LENGTH = 9;
 
+protected:
   MHZ19X_error_t sendCommand(const uint8_t* /*const*/ command, uint8_t* returnValue) /*const*/;
-  uint8_t computeChecksum(const uint8_t* const packet) const;
 
 private:
-  using module_t = MHZ19XDriver<TUartStream>;
-
   TUartStream stream;
 };
 
@@ -57,7 +53,7 @@ MHZ19X_error_t MHZ19XDriver<TUartStream>::getCO2Concentration(
   // 0x86: Read CO2 concentration
   constexpr uint8_t startByte = 0xFF;
   constexpr uint8_t commandByte = 0x86;
-  uint8_t commandReadCo2Concentration[module_t::COMMAND_LENGTH] = {
+  uint8_t commandReadCo2Concentration[COMMAND_LENGTH] = {
     startByte, // Start Byte
     0x01, // Reserved
     commandByte, // Command
@@ -68,7 +64,7 @@ MHZ19X_error_t MHZ19XDriver<TUartStream>::getCO2Concentration(
     0x00,
     0x79, // Checksum
   };
-  uint8_t returnValue[module_t::RETURNVALUE_LENGTH] = { 0 };
+  uint8_t returnValue[RETURNVALUE_LENGTH] = { 0 };
 
   auto result = sendCommand(commandReadCo2Concentration, returnValue);
 
@@ -81,7 +77,7 @@ MHZ19X_error_t MHZ19XDriver<TUartStream>::getCO2Concentration(
   if (returnValue[1] != commandByte) // Command
     return MHZ19X_error_t::returnvalue_commandbyte_mismatch;
 
-  if (returnValue[module_t::RETURNVALUE_LENGTH - 1] != computeChecksum(returnValue)) // Checksum
+  if (returnValue[RETURNVALUE_LENGTH - 1] != computeChecksum(returnValue)) // Checksum
     return MHZ19X_error_t::returnvalue_checksum_mismatch;
 
   // CO2 concentration = HIGH * 256 + LOW
@@ -98,7 +94,7 @@ MHZ19X_error_t MHZ19XDriver<TUartStream>::switchSelfCalibration(
 ) /*const*/
 {
   // 0x79: On/Off Self-calibration for Zero Point
-  uint8_t commandOnOffSelfCalibration[module_t::COMMAND_LENGTH] = {
+  uint8_t commandOnOffSelfCalibration[COMMAND_LENGTH] = {
     0xFF, // Start Byte
     0x01, // Reserved
     0x79, // Command
@@ -110,7 +106,7 @@ MHZ19X_error_t MHZ19XDriver<TUartStream>::switchSelfCalibration(
     0xCD, // Checksum (placeholder)
   };
 
-  commandOnOffSelfCalibration[module_t::COMMAND_LENGTH - 1] = computeChecksum(commandOnOffSelfCalibration);
+  commandOnOffSelfCalibration[COMMAND_LENGTH - 1] = computeChecksum(commandOnOffSelfCalibration);
 
   return sendCommand(commandOnOffSelfCalibration, nullptr); // no return value
 }
@@ -121,41 +117,20 @@ MHZ19X_error_t MHZ19XDriver<TUartStream>::sendCommand(
   uint8_t* returnValue
 ) /*const*/
 {
-  if (!stream.writeBytes(command, module_t::COMMAND_LENGTH))
+  if (!stream.writeBytes(command, COMMAND_LENGTH))
     return MHZ19X_error_t::uart_write_failure;
 
   if (!returnValue)
     return MHZ19X_error_t::success; // send only (no return value)
 
-  auto len = stream.readBytes(returnValue, module_t::RETURNVALUE_LENGTH);
+  auto len = stream.readBytes(returnValue, RETURNVALUE_LENGTH);
 
   if (len == 0)
     return MHZ19X_error_t::uart_read_timeout;
-  else if (len != module_t::RETURNVALUE_LENGTH)
+  else if (len != RETURNVALUE_LENGTH)
     return MHZ19X_error_t::uart_read_failure;
 
   return MHZ19X_error_t::success;
-}
-
-template <typename TUartStream>
-uint8_t MHZ19XDriver<TUartStream>::computeChecksum(
-  const uint8_t* const packet
-) const
-{
-  uint8_t checksum = 0u;
-
-  // 1. Add Byte 1 to Byte 7
-  for (auto i = 1; i <= 7; i++) {
-    checksum += packet[i];
-  }
-
-  // 2. Negative
-  checksum = 0xFFu - checksum;
-
-  // 3. Then+1
-  checksum += 1u;
-
-  return checksum;
 }
 
 #endif // MHZ19XDriver_hpp
