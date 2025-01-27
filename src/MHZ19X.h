@@ -37,6 +37,16 @@ using MHZ19C_UART2 = MHZ19XDriver<ESP32HardwareSerialStream<2, 16, 17>>;
 #endif // ARDUINO_ARCH_ESP32
 
 //
+// atmelavr + ATmega328 (Arduino-compatible boards)
+//
+#if defined (__AVR_ATmega328P__)
+#include <DefaultSerialStream.hpp>
+
+// MHZ19C
+using MHZ19C = MHZ19XDriver<DefaultSerialStream>;
+#endif
+
+//
 // atmelmegaavr + ATtinyX02 (202/402)
 // atmelmegaavr + ATtinyX04 (204/404/804/1604)
 //

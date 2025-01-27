@@ -22,6 +22,7 @@ TO BE ADDED
 - ESP32
 - ATtiny 402
 - ATtiny 404
+- Arduino Nano
 
 TO BE ADDED
 
