@@ -9,15 +9,16 @@
 
 template <typename TUartStream>
 class MHZ19XDriver {
-  public:
-    MHZ19XDriver()
-      : stream()
-    {}
+public:
+  MHZ19XDriver()
+    : stream()
+  {
+  }
 
-    void begin();
+  void begin();
 
-    MHZ19X_error_t getCO2Concentration(uint16_t& co2ConcentrationInPpm) /*const*/;
-    MHZ19X_error_t switchSelfCalibration(const bool& enableAutoCalibration) /*const*/;
+  MHZ19X_error_t getCO2Concentration(uint16_t& co2ConcentrationInPpm) /*const*/;
+  MHZ19X_error_t switchSelfCalibration(const bool& enableAutoCalibration) /*const*/;
 
 protected:
   static constexpr size_t COMMAND_LENGTH = 9;

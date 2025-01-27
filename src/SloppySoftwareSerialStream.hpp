@@ -16,180 +16,182 @@ template <
   unsigned RX_STOP_DELAY_MICROSECS
 >
 class SloppySoftwareSerialStream {
-  private:
-    using self_t = SloppySoftwareSerialStream<
-      PIN_RX,
-      PIN_TX,
-      TX_DELAY_MICROSECS,
-      RX_DATA_DELAY_MICROSECS,
-      RX_START_DELAY_MICROSECS,
-      RX_STOP_DELAY_MICROSECS
-    >;
-    using index_t = uint8_t;
+private:
+  using self_t = SloppySoftwareSerialStream<
+    PIN_RX,
+    PIN_TX,
+    TX_DELAY_MICROSECS,
+    RX_DATA_DELAY_MICROSECS,
+    RX_START_DELAY_MICROSECS,
+    RX_STOP_DELAY_MICROSECS
+  >;
+  using index_t = uint8_t;
 
-  public:
-    SloppySoftwareSerialStream()
-    {}
+public:
+  SloppySoftwareSerialStream()
+  {
+  }
 
-    void begin(
-      const uint16_t& baud,
-      const uint16_t& configurations
-    ) /* const */
-    {
-      pinMode(PIN_TX, OUTPUT);
+  void begin(
+    const uint16_t& baud,
+    const uint16_t& configurations
+  ) /* const */
+  {
+    pinMode(PIN_TX, OUTPUT);
+    digitalWrite(PIN_TX, HIGH);
+
+    pinMode(PIN_RX, INPUT);
+    attachInterrupt(PIN_RX, self_t::handleReceive, CHANGE);
+
+    attachedInstance = this;
+    receiveBufferIndexForRead = 0;
+    receiveBufferIndexForWrite = 0;
+  }
+
+  bool writeBytes(
+    const uint8_t* /*const*/ data,
+    const size_t& length
+  ) /* const */
+  {
+    for (auto index = 0; index < length; index++) {
+      // start bit
+      digitalWrite(PIN_TX, LOW);
+      delayMicroseconds(TX_DELAY_MICROSECS);
+
+      auto d = data[index];
+
+      // data bits
+      for (auto i = 0; i < dataSizeInBits; i++) {
+        digitalWrite(PIN_TX, d & 0b1 ? HIGH : LOW);
+        delayMicroseconds(TX_DELAY_MICROSECS);
+
+        d >>= 1;
+      }
+
+      // stop bit
       digitalWrite(PIN_TX, HIGH);
-
-      pinMode(PIN_RX, INPUT);
-      attachInterrupt(PIN_RX, self_t::handleReceive, CHANGE);
-
-      attachedInstance = this;
-      receiveBufferIndexForRead = 0;
-      receiveBufferIndexForWrite = 0;
+      delayMicroseconds(TX_DELAY_MICROSECS);
     }
 
-    bool writeBytes(
-      const uint8_t* /*const*/ data,
-      const size_t& length
-    ) /* const */
-    {
-      for (auto index = 0; index < length; index++) {
-        // start bit
-        digitalWrite(PIN_TX, LOW);
-        delayMicroseconds(TX_DELAY_MICROSECS);
+    return true;
+  }
 
-        auto d = data[index];
+  size_t readBytes(
+    uint8_t* /*const*/ buffer,
+    const size_t& length
+  ) /* const */
+  {
+    size_t count = 0;
+    uint8_t* buf = buffer;
 
-        // data bits
-        for (auto i = 0; i < dataSizeInBits; i++) {
-          digitalWrite(PIN_TX, d & 0b1 ? HIGH : LOW);
-          delayMicroseconds(TX_DELAY_MICROSECS);
+    for (;;) {
+      if (length <= count)
+        break;
 
-          d >>= 1;
-        }
+      auto b = readWithTimeout();
 
-        // stop bit
-        digitalWrite(PIN_TX, HIGH);
-        delayMicroseconds(TX_DELAY_MICROSECS);
-      }
+      if (b < 0)
+        break;
 
-      return true;
+      *buf++ = (uint8_t)b;
+
+      count++;
     }
 
-    size_t readBytes(
-      uint8_t* /*const*/ buffer,
-      const size_t& length
-    ) /* const */
-    {
-      size_t count = 0;
-      uint8_t* buf = buffer;
+    return count;
+  }
 
-      for (;;) {
-        if (length <= count)
-          break;
+private:
+  static constexpr size_t dataSizeInBits = 8; // size of data bits
+  static constexpr size_t receiveBufferSize = 9 * 2; // = return value length * 2
 
-        auto b = readWithTimeout();
+  static self_t* attachedInstance;
 
-        if (b < 0)
-          break;
+  uint8_t receiveBuffer[receiveBufferSize];
+  volatile index_t receiveBufferIndexForRead;
+  volatile index_t receiveBufferIndexForWrite;
 
-        *buf++ = (uint8_t)b;
+  static inline void handleReceive()
+  {
+    if (!attachedInstance)
+      return;
 
-        count++;
-      }
+    // disable interrupt while receiving
+    noInterrupts();
 
-      return count;
-    }
+    attachedInstance->receive();
 
-  private:
-    static constexpr size_t dataSizeInBits = 8; // size of data bits
-    static constexpr size_t receiveBufferSize = 9 * 2; // = return value length * 2
+    // re-enable interrupt
+    interrupts();
+  }
 
-    static self_t* attachedInstance;
+  void receive()
+  {
+    // expect the start bit
+    if (digitalRead(PIN_RX))
+      return; // not a start bit
 
-    uint8_t receiveBuffer[receiveBufferSize];
-    volatile index_t receiveBufferIndexForRead;
-    volatile index_t receiveBufferIndexForWrite;
+    delayMicroseconds(RX_START_DELAY_MICROSECS);
 
-    static inline void handleReceive() {
-      if (!attachedInstance)
-        return;
+    // read data bits
+    uint8_t data = 0x00;
 
-      // disable interrupt while receiving
-      noInterrupts();
+    for (size_t i = 0; i < dataSizeInBits; i++) {
+      delayMicroseconds(RX_DATA_DELAY_MICROSECS);
 
-      attachedInstance->receive();
+      data >>= 1;
 
-      // re-enable interrupt
-      interrupts();
-    }
-
-    void receive()
-    {
-      // expect the start bit
       if (digitalRead(PIN_RX))
-        return; // not a start bit
-
-      delayMicroseconds(RX_START_DELAY_MICROSECS);
-
-      // read data bits
-      uint8_t data = 0x00;
-
-      for (size_t i = 0; i < dataSizeInBits; i++) {
-        delayMicroseconds(RX_DATA_DELAY_MICROSECS);
-
-        data >>= 1;
-
-        if (digitalRead(PIN_RX))
-          data |= 0b10000000;
-      }
-
-      // store to the buffer
-      auto nextIndex = (index_t)((receiveBufferIndexForWrite + 1) % receiveBufferSize);
-
-      if (nextIndex == receiveBufferIndexForRead) {
-        // buffer overflow, discard the received data
-      }
-      else {
-        receiveBuffer[receiveBufferIndexForWrite] = data;
-        receiveBufferIndexForWrite = nextIndex;
-      }
-
-      // expect the stop bit
-      delayMicroseconds(RX_STOP_DELAY_MICROSECS);
+        data |= 0b10000000;
     }
 
-    int read()
-    {
-      if (receiveBufferIndexForRead == receiveBufferIndexForWrite)
-        return -1; // buffer empty or overflow
+    // store to the buffer
+    auto nextIndex = (index_t)((receiveBufferIndexForWrite + 1) % receiveBufferSize);
 
-      index_t index = receiveBufferIndexForRead;
-
-      receiveBufferIndexForRead = (index_t)((receiveBufferIndexForRead + 1) % receiveBufferSize);
-
-      return receiveBuffer[index];
+    if (nextIndex == receiveBufferIndexForRead) {
+      // buffer overflow, discard the received data
+    }
+    else {
+      receiveBuffer[receiveBufferIndexForWrite] = data;
+      receiveBufferIndexForWrite = nextIndex;
     }
 
-    int readWithTimeout()
-    {
-      constexpr unsigned int timeoutMilliseconds = 500;
-      unsigned int startAt = millis();
-      unsigned int timeoutAt = startAt + timeoutMilliseconds;
+    // expect the stop bit
+    delayMicroseconds(RX_STOP_DELAY_MICROSECS);
+  }
 
-      for (;;) {
-        auto b = read();
+  int read()
+  {
+    if (receiveBufferIndexForRead == receiveBufferIndexForWrite)
+      return -1; // buffer empty or overflow
 
-        if (0 <= b)
-          return b;
+    index_t index = receiveBufferIndexForRead;
 
-        unsigned int now = millis();
+    receiveBufferIndexForRead = (index_t)((receiveBufferIndexForRead + 1) % receiveBufferSize);
 
-        if (now < startAt)
-          return -1; // counter rewound
-        if (timeoutAt <= now)
-          return -1; // timed out
-      }
+    return receiveBuffer[index];
+  }
+
+  int readWithTimeout()
+  {
+    constexpr unsigned int timeoutMilliseconds = 500;
+    unsigned int startAt = millis();
+    unsigned int timeoutAt = startAt + timeoutMilliseconds;
+
+    for (;;) {
+      auto b = read();
+
+      if (0 <= b)
+        return b;
+
+      unsigned int now = millis();
+
+      if (now < startAt)
+        return -1; // counter rewound
+      if (timeoutAt <= now)
+        return -1; // timed out
     }
+  }
 };
 
 template <
