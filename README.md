@@ -1,7 +1,7 @@
 # MH-Z19 CO2 sensor library for Arduino Framework
 Winsen Sensors製 NDIR方式 CO2センサーモジュール、**MH-Z19シリーズ**用のライブラリです。
 
-Arduino Frameworkが利用可能なMCU/マイクロコントローラでMH-Z19シリーズを動作させることができます。
+Arduino Frameworkが利用可能な各種ボード/MCUでMH-Z19シリーズを動作させることができます。
 
 # Usage / 使用例
 [examples](./examples/)ディレクトリから、各ボード/MCU向けのサンプルコードを閲覧できます。
@@ -19,7 +19,7 @@ This library only supports retrieving measurement values by the serial communica
 
 ## APIとサポートする機能
 ### 任意のUARTシリアル通信の実装を使用可能
-本ライブラリでは、さまざまなMCU/マイクロコントローラで動作させられるよう、UARTシリアル通信を任意の実装に差し替えられるようにしています。　具体的には、[`MHZ19XDriver`](./src/MHZ19XDriver.hpp)クラスのテンプレートパラメータ`TUartStream`に任意の実装を指定することができます。
+本ライブラリでは、さまざまなボード/MCUで動作させられるよう、UARTシリアル通信を任意の実装に差し替えられるようにしています。　具体的には、[`MHZ19XDriver`](./src/MHZ19XDriver.hpp)クラスのテンプレートパラメータ`TUartStream`に任意の実装を指定することができます。
 
 デフォルトでは、標準で使用できるシリアル通信を利用しますが、必要に応じてUARTシリアル通信の実装を差し替えることにより、任意のGPIOピンを使用するように変更することもできます。
 
