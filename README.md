@@ -1,3 +1,5 @@
+[![GitHub license](https://img.shields.io/github/license/smdn/MHZ19X-ArduinoFramework)](https://github.com/smdn/MHZ19X-ArduinoFramework/blob/main/LICENSE.txt)
+
 # MH-Z19 CO2 sensor library for Arduino Framework
 Winsen Sensors製 NDIR方式 CO2センサーモジュール、**MH-Z19シリーズ**用のライブラリです。
 
