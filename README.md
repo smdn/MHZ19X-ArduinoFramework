@@ -103,6 +103,17 @@ void loop()
 - [Parts:Sensor:MH-Z19C - robot-jp wiki](https://robot-jp.com/wiki/index.php/Parts:Sensor:MH-Z19C)
 - https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/PlatformIO.md
 
+
+
+# For contributers
+Contributions are appreciated!
+
+If there's a feature you would like to add or a bug you would like to fix, please read [Contribution guidelines](./CONTRIBUTING.md) and create an Issue or Pull Request.
+
+IssueやPull Requestを送る際は、[Contribution guidelines](./CONTRIBUTING.md)をご覧頂ください。　使用言語は日本語で構いません。
+
+
+
 # Notice
 (An English translation for the reference follows the text written in Japanese.)
 
