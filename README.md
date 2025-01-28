@@ -18,6 +18,52 @@ This library has been tested with [PlatformIO](https://platformio.org/), is also
 This library only supports retrieving measurement values by the serial communication.　Retrieving measurement values from the PWM signals is not supported.
 
 ## APIとサポートする機能
+
+### 測定値の取得
+以下のようなAPIでセンサモジュールの操作を行うことができます。
+
+現時点では、`MH-Z19C`がサポートするCO2濃度の読み取り(コマンド`0x86`)および、セルフキャリブレーションの有効化/無効化の設定(コマンド`0x79`)のみをサポートしています。
+
+```cpp
+#include <Arduino.h>
+#include <MHZ19X.h>
+
+// MH-Z19Cセンサモジュールを操作するインスタンスを作成
+auto co2sensor = MHZ19C(); // Arduinoおよび同互換ボードの場合
+// auto co2sensor = MHZ19C_UART1(); // ESP32の場合
+
+void setup()
+{
+  co2sensor.begin();
+
+  // セルフキャリブレーションをオンにする
+  co2sensor.switchSelfCalibration(true);
+}
+
+void loop()
+{
+  uint16_t co2ppm;
+  MHZ19X_error_t result;
+
+  // CO2濃度を取得する
+  result = co2sensor.getCO2Concentration(co2ppm);
+
+  if (MHZ19X_error_t::success == result) {
+    // 取得に成功した場合、「なんらかのディスプレイ」に測定値を表示する
+    // display.print(co2ppm);
+  }
+
+  delay(3000);
+}
+```
+
+> [!IMPORTANT]
+> センサモジュールを操作する型の名前は、Arduinoおよび同互換ボードでは`MHZ19C`となりますが、これはボード/MCUごとに異なります。　詳細は[examples](./examples/)ディレクトリにあるボード/MCUごとのサンプルコードを参照してください。
+
+> [!IMPORTANT]
+> The type name for the sensor module is `MHZ19C` for Arduino-compatible boards. This type name, however, depends on the board/MCU. See [examples](./examples/) for the actual type names.
+
+
 ### 任意のUARTシリアル通信の実装を使用可能
 本ライブラリでは、さまざまなボード/MCUで動作させられるよう、UARTシリアル通信を任意の実装に差し替えられるようにしています。　具体的には、[`MHZ19XDriver`](./src/MHZ19XDriver.hpp)クラスのテンプレートパラメータ`TUartStream`に任意の実装を指定することができます。
 
@@ -27,12 +73,14 @@ This library only supports retrieving measurement values by the serial communica
 > 標準のシリアル通信が利用できない場合は、ライブラリでのフォールバック実装として[`SloppySoftwareSerialStream`](./src/SloppySoftwareSerialStream.hpp)が利用可能です。
 > ただし、これは`digitalRead()`, `digitalWrite()`および`delayMicroseconds()`を使用した*雑な*実装であり、動作が安定せず期待する結果を得られない場合があります。
 
+
 ## Modules confirmed to work / 動作確認済みモジュール
 - MH-Z19C
 
 > [!NOTE]
 > 他のセンサーモジュールでも動作する可能性はありますが、実機での動作は未検証です。
 > Also the library may work with other sensor modules, but has not been tested with actual modules.
+
 
 ## Boards and MCUs confirmed to work / 動作確認済みのボードとMCU
 - ESP32
@@ -44,7 +92,7 @@ This library only supports retrieving measurement values by the serial communica
   - Arduino Nano
   - Arduino Nano Every
 
-> [!WARNING]
+> [!IMPORTANT]
 > ATtinyで動作させる場合、20 MHzまたは16 MHzで動作させることを推奨します。　それより低い動作周波数では、シリアル通信が安定しません。
 > これは[シリアル通信に使用している実装](./src/SloppySoftwareSerialStream.hpp)が*雑な*実装であるためです。　`delayMicroseconds`に渡す値の調整により改善する場合もありますが、電源電圧の影響を受ける場合もあり、調整の難易度は高いです。
 > ATtinyで動作する、より良いシリアル通信を実装してくれる方がいましたら、ぜひIssuesにてご提案ください。
