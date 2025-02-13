@@ -4,14 +4,19 @@
 #include <MHZ19X.h>
 
 auto mhz19c = MHZ19C();
+auto mhz19e = MHZ19E();
 
 void setup()
 {
   // begin()
   mhz19c.begin();
 
+  mhz19e.begin();
+
   // switchSelfCalibration()
   mhz19c.switchSelfCalibration(true);
+
+  mhz19e.switchSelfCalibration(true);
 }
 
 void loop()
@@ -21,4 +26,6 @@ void loop()
 
   // getCO2Concentration()
   result = mhz19c.getCO2Concentration(co2ppm);
+
+  result = mhz19e.getCO2Concentration(co2ppm);
 }

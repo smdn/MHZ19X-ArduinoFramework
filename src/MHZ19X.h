@@ -31,9 +31,13 @@ using Baud9600SloppySoftwareSerialStream = SloppySoftwareSerialStream<
 #if defined(ARDUINO_ARCH_ESP32)
 #include <ESP32HardwareSerialStream.hpp>
 
-// MHZ19C + UART1/2
+// alias for MHZ19C + UART1/2
 using MHZ19C_UART1 = MHZ19XDriver<ESP32HardwareSerialStream<1, 9, 10>>;
 using MHZ19C_UART2 = MHZ19XDriver<ESP32HardwareSerialStream<2, 16, 17>>;
+
+// alias for MHZ19E + UART1/2
+using MHZ19E_UART1 = MHZ19XDriver<ESP32HardwareSerialStream<1, 9, 10>>;
+using MHZ19E_UART2 = MHZ19XDriver<ESP32HardwareSerialStream<2, 16, 17>>;
 #endif // ARDUINO_ARCH_ESP32
 
 //
@@ -42,8 +46,11 @@ using MHZ19C_UART2 = MHZ19XDriver<ESP32HardwareSerialStream<2, 16, 17>>;
 #if defined (__AVR_ATmega328P__)
 #include <DefaultSerialStream.hpp>
 
-// MHZ19C
+// alias for MHZ19C
 using MHZ19C = MHZ19XDriver<DefaultSerialStream>;
+
+// alias for MHZ19E
+using MHZ19E = MHZ19XDriver<DefaultSerialStream>;
 #endif
 
 //
@@ -61,7 +68,11 @@ public:
   }
 };
 
+// alias for MHZ19C + Serial1
 using MHZ19C_Serial1 = MHZ19XDriver<Serial1Stream>;
+
+// alias for MHZ19E + Serial1
+using MHZ19E_Serial1 = MHZ19XDriver<Serial1Stream>;
 #endif
 
 #if defined(HAVE_HWSERIAL2)
@@ -73,7 +84,11 @@ public:
   }
 };
 
+// alias for MHZ19C + Serial2
 using MHZ19C_Serial2 = MHZ19XDriver<Serial2Stream>;
+
+// alias for MHZ19E + Serial2
+using MHZ19E_Serial2 = MHZ19XDriver<Serial2Stream>;
 #endif
 
 #if defined(HAVE_HWSERIAL3)
@@ -85,7 +100,11 @@ public:
   }
 };
 
+// alias for MHZ19C + Serial3
 using MHZ19C_Serial3 = MHZ19XDriver<Serial3Stream>;
+
+// alias for MHZ19E + Serial3
+using MHZ19E_Serial3 = MHZ19XDriver<Serial3Stream>;
 #endif
 
 #endif //__AVR_ATmega4809__
@@ -123,12 +142,19 @@ using TunedBaud9600SloppySoftwareSerialStream = Baud9600SloppySoftwareSerialStre
 #endif // F_CPU == ***
 > ;
 
-// MHZ19C
+// alias for MHZ19C
 template <
   int8_t PIN_RX,
   int8_t PIN_TX
 >
 using MHZ19C = MHZ19XDriver<TunedBaud9600SloppySoftwareSerialStream<PIN_RX, PIN_TX>>;
+
+// alias for MHZ19E
+template <
+  int8_t PIN_RX,
+  int8_t PIN_TX
+>
+using MHZ19E = MHZ19XDriver<TunedBaud9600SloppySoftwareSerialStream<PIN_RX, PIN_TX>>;
 #endif // __AVR_ATtinyx02__
 
 #endif // MHZ19X_h
