@@ -53,16 +53,17 @@ jobs:
     - name: Install python
       uses: actions/setup-python@v5.4.0
       with:
-        python-version: '3.11'
+        python-version: '3.12.3'
 
     - name: Install PlatformIO Core
       run: |
         # ref: https://docs.platformio.org/en/stable/integration/ci/github-actions.html#using-cmd-run-command
         pip install --upgrade platformio
 
-    - name: Build PlatformIO Project
+    - name: Run tests
       shell: pwsh
       run: |
+        # TODO: use pio run --silent
         $verbose = '${{ inputs.verbose }}' -ieq 'true'
 
-        pio run
+        tests/test-build/run.sh
