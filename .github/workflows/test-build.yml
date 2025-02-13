@@ -63,6 +63,7 @@ jobs:
     - name: Run tests
       shell: pwsh
       run: |
+        # TODO: use pio run --silent
         $verbose = '${{ inputs.verbose }}' -ieq 'true'
 
         tests/test-build/run.sh
