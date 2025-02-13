@@ -60,7 +60,7 @@ jobs:
         # ref: https://docs.platformio.org/en/stable/integration/ci/github-actions.html#using-cmd-run-command
         pip install --upgrade platformio
 
-    - name: Build PlatformIO Project
+    - name: Run tests
       shell: pwsh
       run: |
         $verbose = '${{ inputs.verbose }}' -ieq 'true'
