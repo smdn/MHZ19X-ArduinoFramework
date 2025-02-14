@@ -78,6 +78,7 @@ void loop()
 
 ## Modules confirmed to work / 動作確認済みモジュール
 - MH-Z19C
+- MH-Z19E
 
 > [!NOTE]
 > 他のセンサーモジュールでも動作する可能性はありますが、実機での動作は未検証です。
