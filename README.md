@@ -24,7 +24,7 @@ This library only supports retrieving measurement values by the serial communica
 ### 測定値の取得
 以下のようなAPIでセンサモジュールの操作を行うことができます。
 
-現時点では、`MH-Z19C`がサポートするCO2濃度の読み取り(コマンド`0x86`)および、セルフキャリブレーションの有効化/無効化の設定(コマンド`0x79`)のみをサポートしています。
+現時点では、MH-Z19シリーズがサポートするCO2濃度の読み取り(コマンド`0x86`)および、セルフキャリブレーションの有効化/無効化の設定(コマンド`0x79`)のみをサポートしています。
 
 ```cpp
 #include <Arduino.h>
