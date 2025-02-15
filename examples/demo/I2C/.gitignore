@@ -1,0 +1,3 @@
+*.bak
+*-backups/*.zip
+~*.kicad_sch.lck

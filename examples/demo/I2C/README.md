@@ -11,6 +11,11 @@ I2Cバスを経由して、MH-Z19シリーズのモジュールから計測値�
 - [MHZ19XI2C-SLV](./MHZ19XI2C-SLV/): MH-Z19シリーズのモジュールを、I2Cデバイスとして動作させるためのPlatformIOプロジェクトです。　このデモでは、MCUとして**ATtiny402**を使用しています。
 - [MHZ19XI2C-MST](./MHZ19XI2C-MST/): MH-Z19シリーズのモジュールを、I2Cバス経由で操作し、計測値を取得するためのPlatformIOプロジェクトです。　このデモでは、MCUとして**ESP32**を使用しています。
 
+## 配線図
+このデモで使用している配線は次のとおりです。　一部周辺部品等は省略しています。
+
+![Schematic diagram for this demonstration.](MHZ19XI2C.svg)
+
 ## I2Cアドレス
 `0x19`を使用します。
 
