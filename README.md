@@ -6,6 +6,8 @@ Winsen Sensors製 NDIR方式 CO2センサーモジュール、**MH-Z19シリー�
 
 Arduino Frameworkが利用可能な各種ボード/MCUでMH-Z19シリーズを動作させることができます。
 
+![working example with ATtiny 402 + MH-Z19C](./doc/working-example_ATTiny402+MHZ19C.jpg)
+
 # Usage / 使用例
 [examples](./examples/)ディレクトリから、各ボード/MCU向けのサンプルコードを閲覧できます。
 
