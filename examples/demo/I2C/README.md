@@ -7,6 +7,8 @@ This document demonstrates an MH-Z19 series module operating as an I2C device an
 
 I2Cバスを経由して、MH-Z19シリーズのモジュールから計測値を取得できるようにすることを目的としていますが、実装として作り込みは十分ではありません。
 
+![Example of this demonstration in operation](wiring.jpg)
+
 ## ディレクトリ構成 / Directory map
 
 - [MHZ19XI2C](./MHZ19XI2C/): 後述するI2Cコマンドおよびレジスタの定義を含むヘッダファイル[`MHZ19XI2C.hpp`](./MHZ19XI2C/MHZ19XI2C.hpp)を提供します。
