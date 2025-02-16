@@ -85,6 +85,10 @@ void loop()
 > 他のセンサーモジュールでも動作する可能性はありますが、実機での動作は未検証です。
 > Also the library may work with other sensor modules, but has not been tested with actual modules.
 
+|Module|Image|Details|
+|-|-|-|
+|MH-Z19C|![MH-Z19C](./doc/modules/MH-Z19C.jpg)|[https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19c.html](https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19c.html)|
+|MH-Z19E|![MH-Z19E](./doc/modules/MH-Z19E.jpg)|[https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19e.html](https://www.winsen-sensor.com/sensors/co2-sensor/mh-z19e.html)|
 
 ## Boards and MCUs confirmed to work / 動作確認済みのボードとMCU
 - ESP32
