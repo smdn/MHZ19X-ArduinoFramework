@@ -51,7 +51,7 @@ jobs:
         key: ${{ runner.os }}-pio
 
     - name: Install python
-      uses: actions/setup-python@v5.4.0
+      uses: actions/setup-python@v6.0.0
       with:
         python-version: '3.12.3'
 
