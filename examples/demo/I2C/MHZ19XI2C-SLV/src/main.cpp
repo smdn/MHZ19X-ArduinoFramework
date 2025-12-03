@@ -89,8 +89,6 @@ void receiveEvent(int numberOfBytes)
       if (numberOfBytes < 2)
         return; // too short
 
-      getCO2ConcentrationIntervalInSeconds = numberOfBytes;
-
       switch ((MHZ19XI2C_register_t)Wire.read()) { // switch by requested register address
         case MHZ19XI2C_register_t::enable_self_calibration:
           if (numberOfBytes < 3)
