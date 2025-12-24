@@ -3,9 +3,12 @@
 #include <Wire.h>
 #include <MHZ19X.h>
 #include <MHZ19XI2C.hpp>
+#include <avr/wdt.h>
+
+constexpr bool enableSelfCalibrationInitialValue = true;
 
 // MHZ19XI2C_register_t::enable_self_calibration
-volatile bool enableSelfCalibration = true;
+volatile bool enableSelfCalibration = enableSelfCalibrationInitialValue;
 
 // MHZ19XI2C_register_t::latest_co2ppm
 uint16_t latestCO2ppm = 0;
@@ -15,6 +18,11 @@ volatile uint8_t getCO2ConcentrationIntervalInSeconds = 5;
 
 // MHZ19XI2C_register_t::error_code
 MHZ19X_error_t getCO2ConcentrationResult = MHZ19X_error_t::success;
+
+// If errors on measurement reading occur consecutively beyond the following count,
+// a software reset using watchdog will be triggered as there could be
+// an inconsistency in serial reading.
+constexpr size_t MaxConsecutiveErrorCount = 10;
 
 auto sensor = MHZ19C<PIN_PA6, PIN_PA7>();
 
@@ -26,20 +34,28 @@ void requestEvent();
 
 void setup()
 {
+  // enable 1-seconds watchdog timer to trigger a software reset if any operation hangs
+  wdt_enable(WDTO_1S);
+
   sensor.begin();
 
-  auto switchSelfCalibrationTo = enableSelfCalibration;
+  sensor.switchSelfCalibration(enableSelfCalibrationInitialValue);
 
-  sensor.switchSelfCalibration(switchSelfCalibrationTo);
+  wdt_reset();
 
   Wire.begin(MHZ19XI2C_DEVICE_ADDRESS);
   Wire.onReceive(receiveEvent);
   Wire.onRequest(requestEvent);
+
+  wdt_reset();
 }
 
 void loop()
 {
-  static bool isSelfCalibrationEnabled = enableSelfCalibration;
+  static bool isSelfCalibrationEnabled = enableSelfCalibrationInitialValue;
+  static size_t getCO2ConcentrationConsecutiveErrorCount = 0;
+
+  wdt_reset();
 
   noInterrupts();
 
@@ -60,15 +76,27 @@ void loop()
 
   delay(intervalInMilliseconds);
 
+  wdt_reset();
+
   // retrieve the latest measurement value from sensor
   uint16_t co2ppm = 0;
 
   getCO2ConcentrationResult = sensor.getCO2Concentration(co2ppm);
 
-  if (MHZ19X_error_t::success == getCO2ConcentrationResult)
+  if (MHZ19X_error_t::success == getCO2ConcentrationResult) {
+    getCO2ConcentrationConsecutiveErrorCount = 0; // reset the number of consecutive errors
     latestCO2ppm = co2ppm; // set the latest measurement value
-  else
+  }
+  else {
+    getCO2ConcentrationConsecutiveErrorCount++; // increment the number of consecutive errors
     latestCO2ppm = 0;
+  }
+
+  if (MaxConsecutiveErrorCount <= getCO2ConcentrationConsecutiveErrorCount) {
+    // trigger a software reset using watchdog timer
+    wdt_enable(WDTO_15MS);
+    delay(10000);
+  }
 }
 
 void receiveEvent(int numberOfBytes)
