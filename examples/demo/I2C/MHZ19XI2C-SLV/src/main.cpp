@@ -17,7 +17,7 @@ uint16_t latestCO2ppm = 0;
 volatile uint8_t getCO2ConcentrationIntervalInSeconds = 5;
 
 // MHZ19XI2C_register_t::error_code
-MHZ19X_error_t getCO2ConcentrationResult = MHZ19X_error_t::success;
+auto getCO2ConcentrationResult = MHZ19X_error_t::none;
 
 // If errors on measurement reading occur consecutively beyond the following count,
 // a software reset using watchdog will be triggered as there could be

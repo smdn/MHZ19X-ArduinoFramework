@@ -5,6 +5,8 @@
 #define MHZ19X_error_t_hpp
 
 enum class MHZ19X_error_t {
+  // Represents a value that is neither success nor failure.
+  none = -1,
   success = 0,
   uart_write_failure,
   uart_read_timeout,
